@@ -66,16 +66,42 @@ def internal_server_error(e):
 def index():
     form = NameForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.name.data).first()
+        # Obtenha o nome do usuário do formulário
+        username = form.name.data
+
+        # Verifique se o usuário já existe no banco de dados
+        user = User.query.filter_by(username=username).first()
+
         if user is None:
-            user = User(username=form.name.data)
+            # Se o usuário não existir, crie um novo usuário
+            user = User(username=username)
+
+            # Defina a role do novo usuário como "User" (ID = 3)
+            user.role_id = 3
+
+            # Adicione o novo usuário ao banco de dados
             db.session.add(user)
             db.session.commit()
+
+            # Defina a flag 'known' como False para indicar que o usuário é novo
             session['known'] = False
         else:
+            # Se o usuário já existir, defina a flag 'known' como True
             session['known'] = True
-        session['name'] = form.name.data
+
+        # Defina a sessão 'name' com o nome do usuário
+        session['name'] = username
+
+        # Redirecione de volta para a página inicial
         return redirect(url_for('index'))
+
+    # Recupere todos os usuários e todas as roles do banco de dados
     users = User.query.all()
-    return render_template('index.html', form=form, name=session.get('name'),
-                           known=session.get('known', False), users=users)
+    roles = Role.query.all()
+
+    # Renderize o template 'index.html' com os dados
+    return render_template('index.html', form=form, users=users, roles=roles)
+
+
+if __name__ == '__main__':
+    app.run(debug=True)

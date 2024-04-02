@@ -1,38 +1,42 @@
+{% extends "base.html" %}
 
-<!-- saved from url=(0103)https://www.pythonanywhere.com/user/GustavoLopes12/files/home/GustavoLopes12/flask/templates/index.html -->
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body>{% extends "base.html" %}
-{% import "bootstrap/wtf.html" as wtf %}
+{% block title %}Flask{% endblock %}
 
-{% block title %}Flasky{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>Olá, {% if session.name %}{{ session.name }}{% else %}Estranho{% endif %}!</h1>
+        {% if session.known %}
+        <p>Que bom vê-lo novamente!</p>
+        {% else %}
+        <p>É um prazer conhecê-lo!</p>
+        {% endif %}
+    </div>
 
-{% block page_content %}
-<div class="page-header">
-    <h1>Hello, {% if name %}{{ name }}{% else %}Stranger{% endif %}!</h1>
-    {% if not known %}
-    <p>Pleased to meet you!</p>
-    {% else %}
-    <p>Happy to see you again!</p>
-    {% endif %}
-</div>
-{{ wtf.quick_form(form) }}
-
-{% if users %}
-
-    {% for user in users %}
+    <form class="user-form" method="POST">
+        {{ form.csrf_token }}
+        <div class="form-group">
+            {{ form.name.label(class="form-label") }}
+            {{ form.name(class="form-control") }}
+        </div>
+        <button type="submit" class="btn btn-primary">Enviar</button>
+    </form>
     
-    {% endfor %}
-  <table class="table">
-  <thead>
-    <tr>
-      <th scope="col">Nome do usuário</th>
-      <th scope="col">Função</th>
-    </tr>
-  </thead>
-  <tbody><tr>
-      <td>{{ user.username }}</td>
-      <td>{{ user.role.name if user.role else 'User' }}</td>
-    </tr></tbody>
-</table>
-{% endif %}
+    <table class="table user-table">
+        <thead>
+            <tr>
+                <th>Nome de Usuário</th>
+                <th>Função</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.role.name }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}
-</body></html>
